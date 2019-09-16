@@ -4,7 +4,7 @@ import memoize from 'lodash.memoize';
 import pick from 'lodash.pick';
 
 import getQueryParameters from './getQueryParameters';
-import { defaultAuthentication } from './frontendAuthWrapper';
+import { defaultAuthenticatedUser } from './frontendAuthWrapper';
 import validateConfig from './validateConfig';
 
 export const APP_TOPIC = 'APP';
@@ -16,7 +16,7 @@ export default class App {
   static _config = null;
   static _apiClient = null;
   static history = createBrowserHistory();
-  static authentication = defaultAuthentication;
+  static authenticatedUser = defaultAuthenticatedUser;
   static getQueryParams = memoize(getQueryParameters);
 
   static set config(newConfiguration) {
@@ -72,7 +72,7 @@ export default class App {
     this._config = null;
     this._apiClient = null;
     this._error = null;
-    this.authentication = defaultAuthentication;
+    this.authenticatedUser = defaultAuthenticatedUser;
     PubSub.unsubscribe(APP_TOPIC);
   }
 }

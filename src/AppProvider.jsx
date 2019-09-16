@@ -6,11 +6,11 @@ import { Router } from 'react-router-dom';
 
 import App from './App';
 import ErrorBoundary from './ErrorBoundary';
-import AuthenticationContext from './AuthenticationContext';
+import AppContext from './AppContext';
 
 const AppProvider = ({ store, children }) => (
   <ErrorBoundary>
-    <AuthenticationContext.Provider value={App.authentication}>
+    <AppContext.Provider value={{ authenticatedUser: App.authenticatedUser, config: App.config }}>
       <IntlProvider locale={getLocale()} messages={getMessages()}>
         <Provider store={store}>
           <Router history={App.history}>
@@ -20,7 +20,7 @@ const AppProvider = ({ store, children }) => (
           </Router>
         </Provider>
       </IntlProvider>
-    </AuthenticationContext.Provider>
+    </AppContext.Provider>
   </ErrorBoundary>
 );
 

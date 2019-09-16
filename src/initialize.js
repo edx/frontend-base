@@ -11,7 +11,7 @@ import { configureLoggingService } from '@edx/frontend-logging';
 import App from './App';
 import configuration from './configuration';
 import mergeMessages from './mergeMessages';
-import { configureUserAccountApiService, getAuthentication } from './frontendAuthWrapper';
+import { getAuthenticatedUser } from './frontendAuthWrapper';
 
 // Our configuration is known statically, so we set it immediately.
 App.config = configuration;
@@ -39,12 +39,8 @@ export default async function initialize({ messages, loggingService, ...other })
     const accessToken =
       await App.apiClient.ensurePublicOrAuthenticationAndCookies(global.location.pathname);
     // Once we have refreshed our authentication, extract it for use later.
-    if (!accessToken) {
-      const error = new Error('Empty accessToken returned from ensurePublicOrAuthenticationAndCookies callback.');
-      loggingService.logError(error.message);
-      throw error;
-    }
-    App.authentication = getAuthentication(App.apiClient);
+
+    App.authenticatedUser = getAuthenticatedUser(accessToken);
 
     // Configure services.
     configureI18n(configuration, Array.isArray(messages) ? mergeMessages(messages) : messages);
@@ -55,7 +51,6 @@ export default async function initialize({ messages, loggingService, ...other })
       authApiClient: App.apiClient,
       analyticsApiBaseUrl: configuration.LMS_BASE_URL,
     });
-    configureUserAccountApiService(configuration, App.apiClient);
 
     // Application is now ready to be used.
     App.ready();

@@ -5,6 +5,7 @@ import { configure as configureI18n } from '@edx/frontend-i18n';
 
 import configuration from './configuration';
 import AppProvider from './AppProvider';
+import App from './App';
 
 configureI18n(configuration, {
   ar: {},
@@ -21,6 +22,8 @@ configureI18n(configuration, {
   th: {},
   uk: {},
 });
+
+App.config = {};
 
 describe('AppProvider', () => {
   it('should render its children', () => {

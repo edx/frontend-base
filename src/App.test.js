@@ -18,9 +18,10 @@ describe('App', () => {
   });
 
   it('should have a default authentication', () => {
-    expect(App.authentication).toEqual({
+    expect(App.authenticatedUser).toEqual({
       userId: null,
       username: null,
+      roles: [],
       administrator: false,
     });
   });
