@@ -49,7 +49,7 @@ export default class App {
       PubSub.publish(APP_AUTHENTICATED);
 
       // Internationalization
-      await this.override(handlers.internationalization, overrideHandlers.internationalization);
+      await this.override(handlers.i18n, overrideHandlers.i18n);
       PubSub.publish(APP_I18N_CONFIGURED);
 
       // Logging

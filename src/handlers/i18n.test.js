@@ -1,5 +1,5 @@
-import * as i18n from '@edx/frontend-i18n';
-import internationalization, { mergeMessages } from './internationalization';
+import * as frontendI18n from '@edx/frontend-i18n';
+import i18n, { mergeMessages } from './i18n';
 
 jest.mock('@edx/frontend-i18n', () => ({
   configure: jest.fn(),
@@ -47,9 +47,9 @@ describe('mergeMessages', () => {
   });
 });
 
-describe('internationalization', () => {
+describe('i18n', () => {
   beforeEach(() => {
-    jest.spyOn(i18n, 'configure');
+    jest.spyOn(frontendI18n, 'configure');
   });
 
   it('should call configure with the app config and messages object', () => {
@@ -57,8 +57,8 @@ describe('internationalization', () => {
       messages: { foo: 'bar' },
       config: { boo: 'baz' },
     };
-    internationalization(app);
-    expect(i18n.configure).toHaveBeenCalledWith(app.config, app.messages);
+    i18n(app);
+    expect(frontendI18n.configure).toHaveBeenCalledWith(app.config, app.messages);
   });
 
   it('should call configure with the app config and merged messages array', () => {
@@ -66,7 +66,7 @@ describe('internationalization', () => {
       messages: [{ foo: 'bar' }, { foo: 'buh' }, { gah: 'wut' }],
       config: { boo: 'baz' },
     };
-    internationalization(app);
-    expect(i18n.configure).toHaveBeenCalledWith(app.config, { foo: 'buh', gah: 'wut' });
+    i18n(app);
+    expect(frontendI18n.configure).toHaveBeenCalledWith(app.config, { foo: 'buh', gah: 'wut' });
   });
 });

@@ -8,7 +8,7 @@ import {
   beforeReady,
   configuration,
   error,
-  internationalization,
+  i18n,
   logging,
   ready,
 } from './handlers';
@@ -41,7 +41,7 @@ describe('App', () => {
       beforeReady.mockClear();
       configuration.mockClear();
       error.mockClear();
-      internationalization.mockClear();
+      i18n.mockClear();
       logging.mockClear();
       ready.mockClear();
     });
@@ -84,7 +84,7 @@ describe('App', () => {
       expect(beforeInit).toHaveBeenCalledWith(App);
       expect(beforeReady).toHaveBeenCalledWith(App);
       expect(configuration).toHaveBeenCalledWith(App);
-      expect(internationalization).toHaveBeenCalledWith(App);
+      expect(i18n).toHaveBeenCalledWith(App);
       expect(logging).toHaveBeenCalledWith(App);
       expect(ready).toHaveBeenCalledWith(App);
 
@@ -99,7 +99,7 @@ describe('App', () => {
         beforeInit: jest.fn(),
         beforeReady: jest.fn(),
         configuration: jest.fn(),
-        internationalization: jest.fn(),
+        i18n: jest.fn(),
         logging: jest.fn(),
         ready: jest.fn(),
         error: jest.fn(),
@@ -115,7 +115,7 @@ describe('App', () => {
       expect(beforeInit).not.toHaveBeenCalled();
       expect(beforeReady).not.toHaveBeenCalled();
       expect(configuration).not.toHaveBeenCalled();
-      expect(internationalization).not.toHaveBeenCalled();
+      expect(i18n).not.toHaveBeenCalled();
       expect(logging).not.toHaveBeenCalled();
       expect(ready).not.toHaveBeenCalled();
 
@@ -125,7 +125,7 @@ describe('App', () => {
       expect(overrideHandlers.beforeInit).toHaveBeenCalledWith(App);
       expect(overrideHandlers.beforeReady).toHaveBeenCalledWith(App);
       expect(overrideHandlers.configuration).toHaveBeenCalledWith(App);
-      expect(overrideHandlers.internationalization).toHaveBeenCalledWith(App);
+      expect(overrideHandlers.i18n).toHaveBeenCalledWith(App);
       expect(overrideHandlers.logging).toHaveBeenCalledWith(App);
       expect(overrideHandlers.ready).toHaveBeenCalledWith(App);
 
@@ -154,7 +154,7 @@ describe('App', () => {
       expect(analytics).not.toHaveBeenCalled();
       expect(authentication).not.toHaveBeenCalled();
       expect(beforeReady).not.toHaveBeenCalled();
-      expect(internationalization).not.toHaveBeenCalled();
+      expect(i18n).not.toHaveBeenCalled();
       expect(logging).not.toHaveBeenCalled();
       expect(ready).not.toHaveBeenCalled();
 
@@ -191,7 +191,7 @@ describe('App', () => {
       expect(analytics).not.toHaveBeenCalled();
       expect(authentication).not.toHaveBeenCalled();
       expect(beforeReady).not.toHaveBeenCalled();
-      expect(internationalization).not.toHaveBeenCalled();
+      expect(i18n).not.toHaveBeenCalled();
       expect(logging).not.toHaveBeenCalled();
       expect(ready).not.toHaveBeenCalled();
       // Not the default error handler.
