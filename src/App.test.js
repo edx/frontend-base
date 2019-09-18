@@ -225,28 +225,6 @@ describe('App', () => {
     });
   });
 
-  // it('should call APP_READY callbacks when ready', (done) => {
-  //   function callback(message) {
-  //     expect(message).toBe(APP_READY);
-  //     done();
-  //   }
-
-  //   App.subscribe(APP_READY, callback);
-  //   App.ready();
-  // });
-
-  // it('should call APP_ERROR callbacks when error', (done) => {
-  //   const origError = new Error('uhoh');
-  //   function callback(message, error) {
-  //     expect(message).toBe(APP_ERROR);
-  //     expect(error).toBe(origError);
-  //     done();
-  //   }
-
-  //   App.subscribe(APP_ERROR, callback);
-  //   App.error(origError);
-  // });
-
   describe('apiClient', () => {
     it('should throw an error if apiClient is read before being written', () => {
       expect(() => {

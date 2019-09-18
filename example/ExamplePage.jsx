@@ -15,7 +15,7 @@ class ExamplePage extends Component {
   render() {
     return (
       <div>
-        <h1>Example page.</h1>
+        <h1>{this.context.config.SITE_NAME} example page.</h1>
         <p>{this.props.intl.formatMessage(messages['example.message'])}</p>
         <p>Authenticated Username: {this.context.authenticatedUser.username}</p>
       </div>
