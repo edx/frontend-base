@@ -10,7 +10,6 @@ export {
   APP_LOGGING_CONFIGURED,
   APP_READY,
   APP_TOPIC,
-  APP_VALIDATED,
 } from './App';
 export { default as AppProvider } from './AppProvider';
 export { default as AppContext } from './AppContext';
@@ -33,4 +32,3 @@ export { default as error } from './handlers/error';
 export { default as internationalization } from './handlers/internationalization';
 export { default as logging } from './handlers/logging';
 export { default as ready } from './handlers/ready';
-export { default as validation } from './handlers/validation';

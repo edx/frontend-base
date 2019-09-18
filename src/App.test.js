@@ -1,5 +1,5 @@
 
-import App, { APP_BEFORE_INIT, APP_ERROR, APP_CONFIGURED, APP_VALIDATED, APP_AUTHENTICATED, APP_I18N_CONFIGURED, APP_LOGGING_CONFIGURED, APP_ANALYTICS_CONFIGURED, APP_BEFORE_READY, APP_READY } from './App';
+import App, { APP_BEFORE_INIT, APP_ERROR, APP_CONFIGURED, APP_AUTHENTICATED, APP_I18N_CONFIGURED, APP_LOGGING_CONFIGURED, APP_ANALYTICS_CONFIGURED, APP_BEFORE_READY, APP_READY } from './App';
 
 import {
   analytics,
@@ -11,7 +11,6 @@ import {
   internationalization,
   logging,
   ready,
-  validation,
 } from './handlers';
 
 jest.mock('./handlers');
@@ -45,14 +44,12 @@ describe('App', () => {
       internationalization.mockClear();
       logging.mockClear();
       ready.mockClear();
-      validation.mockClear();
     });
 
     it('should call default handlers in the absence of overrides', async (done) => {
       const expectedEvents = [
         APP_BEFORE_INIT,
         APP_CONFIGURED,
-        APP_VALIDATED,
         APP_AUTHENTICATED,
         APP_I18N_CONFIGURED,
         APP_LOGGING_CONFIGURED,
@@ -73,7 +70,6 @@ describe('App', () => {
       }
       App.subscribe(APP_BEFORE_INIT, checkDispatchedDone);
       App.subscribe(APP_CONFIGURED, checkDispatchedDone);
-      App.subscribe(APP_VALIDATED, checkDispatchedDone);
       App.subscribe(APP_AUTHENTICATED, checkDispatchedDone);
       App.subscribe(APP_I18N_CONFIGURED, checkDispatchedDone);
       App.subscribe(APP_LOGGING_CONFIGURED, checkDispatchedDone);
@@ -91,7 +87,6 @@ describe('App', () => {
       expect(internationalization).toHaveBeenCalledWith(App);
       expect(logging).toHaveBeenCalledWith(App);
       expect(ready).toHaveBeenCalledWith(App);
-      expect(validation).toHaveBeenCalledWith(App);
 
       // No error, though.
       expect(error).not.toHaveBeenCalled();
@@ -107,7 +102,6 @@ describe('App', () => {
         internationalization: jest.fn(),
         logging: jest.fn(),
         ready: jest.fn(),
-        validation: jest.fn(),
         error: jest.fn(),
       };
       await App.initialize({
@@ -124,7 +118,6 @@ describe('App', () => {
       expect(internationalization).not.toHaveBeenCalled();
       expect(logging).not.toHaveBeenCalled();
       expect(ready).not.toHaveBeenCalled();
-      expect(validation).not.toHaveBeenCalled();
 
       // All of these.
       expect(overrideHandlers.analytics).toHaveBeenCalledWith(App);
@@ -135,7 +128,6 @@ describe('App', () => {
       expect(overrideHandlers.internationalization).toHaveBeenCalledWith(App);
       expect(overrideHandlers.logging).toHaveBeenCalledWith(App);
       expect(overrideHandlers.ready).toHaveBeenCalledWith(App);
-      expect(overrideHandlers.validation).toHaveBeenCalledWith(App);
 
       // Still no errors
       expect(error).not.toHaveBeenCalled();
@@ -156,7 +148,6 @@ describe('App', () => {
       // All of these.
       expect(beforeInit).toHaveBeenCalledWith(App);
       expect(configuration).toHaveBeenCalledWith(App);
-      expect(validation).toHaveBeenCalledWith(App);
       expect(overrideHandlers.authentication).toHaveBeenCalledWith(App);
 
       // None of these.
@@ -194,7 +185,6 @@ describe('App', () => {
       // All of these.
       expect(beforeInit).toHaveBeenCalledWith(App);
       expect(configuration).toHaveBeenCalledWith(App);
-      expect(validation).toHaveBeenCalledWith(App);
       expect(overrideHandlers.authentication).toHaveBeenCalledWith(App);
 
       // None of these.

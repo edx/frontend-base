@@ -7,4 +7,3 @@ export { default as error } from './error';
 export { default as internationalization } from './internationalization';
 export { default as logging } from './logging';
 export { default as ready } from './ready';
-export { default as validation } from './validation';

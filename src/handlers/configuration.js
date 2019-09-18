@@ -1,3 +1,5 @@
+import validateConfig from '../validateConfig';
+
 /* eslint-disable no-param-reassign */
 const ENVIRONMENT = process.env.NODE_ENV;
 
@@ -24,4 +26,5 @@ export const env = {
 
 export default async function configuration(app) {
   app.config = env;
+  validateConfig(app.config, 'App validation handler');
 }

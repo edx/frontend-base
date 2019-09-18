@@ -9,7 +9,6 @@ import * as handlers from './handlers';
 export const APP_TOPIC = 'APP';
 export const APP_BEFORE_INIT = `${APP_TOPIC}.BEFORE_INIT`;
 export const APP_CONFIGURED = `${APP_TOPIC}.CONFIGURED`;
-export const APP_VALIDATED = `${APP_TOPIC}.VALIDATED`;
 export const APP_AUTHENTICATED = `${APP_TOPIC}.AUTHENTICATED`;
 export const APP_I18N_CONFIGURED = `${APP_TOPIC}.I18N_CONFIGURED`;
 export const APP_LOGGING_CONFIGURED = `${APP_TOPIC}.LOGGING_CONFIGURED`;
@@ -44,10 +43,6 @@ export default class App {
       // Configuration
       await this.override(handlers.configuration, overrideHandlers.configuration);
       PubSub.publish(APP_CONFIGURED);
-
-      // Configuration validation
-      await this.override(handlers.validation, overrideHandlers.validation);
-      PubSub.publish(APP_VALIDATED);
 
       // Authentication
       await this.override(handlers.authentication, overrideHandlers.authentication);
