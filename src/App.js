@@ -1,13 +1,20 @@
 import PubSub from 'pubsub-js';
-import { createBrowserHistory } from 'history';
 import memoize from 'lodash.memoize';
 import pick from 'lodash.pick';
 
 import getQueryParameters from './getQueryParameters';
 import { defaultAuthenticatedUser } from './frontendAuthWrapper';
-import validateConfig from './validateConfig';
+import * as handlers from './handlers';
 
 export const APP_TOPIC = 'APP';
+export const APP_BEFORE_INIT = `${APP_TOPIC}.BEFORE_INIT`;
+export const APP_CONFIGURED = `${APP_TOPIC}.CONFIGURED`;
+export const APP_VALIDATED = `${APP_TOPIC}.VALIDATED`;
+export const APP_AUTHENTICATED = `${APP_TOPIC}.AUTHENTICATED`;
+export const APP_I18N_CONFIGURED = `${APP_TOPIC}.I18N_CONFIGURED`;
+export const APP_LOGGING_CONFIGURED = `${APP_TOPIC}.LOGGING_CONFIGURED`;
+export const APP_ANALYTICS_CONFIGURED = `${APP_TOPIC}.ANALYTICS_CONFIGURED`;
+export const APP_BEFORE_READY = `${APP_TOPIC}.BEFORE_READY`;
 export const APP_READY = `${APP_TOPIC}.READY`;
 export const APP_ERROR = `${APP_TOPIC}.ERROR`;
 
@@ -15,12 +22,65 @@ export const APP_ERROR = `${APP_TOPIC}.ERROR`;
 export default class App {
   static _config = null;
   static _apiClient = null;
-  static history = createBrowserHistory();
+  static history = null;
   static authenticatedUser = defaultAuthenticatedUser;
   static getQueryParams = memoize(getQueryParameters);
+  static error = null;
+
+  static async initialize({
+    messages,
+    loggingService,
+    overrideHandlers = {},
+    ...custom
+  }) {
+    try {
+      await this.override(handlers.beforeInit, overrideHandlers.beforeInit);
+      PubSub.publish(APP_BEFORE_INIT);
+
+      this.messages = messages;
+      this.loggingService = loggingService;
+      this.custom = custom;
+
+      // Configuration
+      await this.override(handlers.configuration, overrideHandlers.configuration);
+      PubSub.publish(APP_CONFIGURED);
+
+      // Configuration validation
+      await this.override(handlers.validation, overrideHandlers.validation);
+      PubSub.publish(APP_VALIDATED);
+
+      // Authentication
+      await this.override(handlers.authentication, overrideHandlers.authentication);
+      PubSub.publish(APP_AUTHENTICATED);
+
+      // Internationalization
+      await this.override(handlers.internationalization, overrideHandlers.internationalization);
+      PubSub.publish(APP_I18N_CONFIGURED);
+
+      // Logging
+      await this.override(handlers.logging, overrideHandlers.logging);
+      PubSub.publish(APP_LOGGING_CONFIGURED);
+
+      // Analytics
+      await this.override(handlers.analytics, overrideHandlers.analytics);
+      PubSub.publish(APP_ANALYTICS_CONFIGURED);
+
+      // Before Ready
+      await this.override(handlers.beforeReady, overrideHandlers.beforeReady);
+      PubSub.publish(APP_BEFORE_READY);
+
+      // Ready
+      await this.override(handlers.ready, overrideHandlers.ready);
+      PubSub.publish(APP_READY);
+    } catch (e) {
+      // Error
+      this.error = e;
+      await this.override(handlers.error, overrideHandlers.error);
+      PubSub.publish(APP_ERROR, e);
+    }
+  }
 
   static set config(newConfiguration) {
-    validateConfig(newConfiguration, 'App');
     this._config = newConfiguration;
   }
 
@@ -29,18 +89,6 @@ export default class App {
       throw new Error('App.config has not been initialized. Are you calling it too early?');
     }
     return this._config;
-  }
-
-  static subscribe(type, callback) {
-    PubSub.subscribe(type, callback);
-  }
-
-  static ready() {
-    PubSub.publish(APP_READY);
-  }
-
-  static error(error) {
-    PubSub.publish(APP_ERROR, error);
   }
 
   static set apiClient(apiClient) {
@@ -52,6 +100,10 @@ export default class App {
       throw new Error('App.apiClient has not been initialized. Are you calling it too early?');
     }
     return this._apiClient;
+  }
+
+  static subscribe(type, callback) {
+    PubSub.subscribe(type, callback);
   }
 
   static get queryParams() {
@@ -66,6 +118,14 @@ export default class App {
     });
 
     return pick(this.config, keys);
+  }
+
+  static async override(defaultHandler, overrideHandler) {
+    if (overrideHandler !== undefined) {
+      await overrideHandler(this);
+    } else {
+      await defaultHandler(this);
+    }
   }
 
   static reset() {

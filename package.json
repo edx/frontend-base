@@ -12,6 +12,7 @@
     "lint": "eslint --ext .js --ext .jsx .",
     "prepublishOnly": "npm run build",
     "semantic-release": "semantic-release",
+    "start": "parcel ./example/index.html --no-source-maps --out-dir example/dist",
     "test": "jest --coverage --passWithNoTests"
   },
   "husky": {
@@ -57,6 +58,7 @@
     "eslint-config-edx": "4.0.4",
     "husky": "3.0.5",
     "jest": "24.9.0",
+    "parcel-bundler": "^1.12.3",
     "prop-types": "15.7.2",
     "react": "16.9.0",
     "react-dom": "16.9.0",
@@ -65,17 +67,19 @@
     "redux": "4.0.4",
     "redux-mock-store": "^1.5.3",
     "redux-saga": "1.0.5",
+    "sass": "^1.22.12",
     "semantic-release": "15.13.24"
   },
   "dependencies": {
-    "history": "4.9.0",
+    "babel-polyfill": "^6.26.0",
+    "history": "^4.9.0",
     "lodash.memoize": "^4.1.2",
     "lodash.merge": "^4.6.2",
     "lodash.pick": "^4.4.0",
-    "pubsub-js": "1.7.0",
-    "redux-devtools-extension": "2.13.8",
-    "redux-logger": "3.0.6",
-    "redux-thunk": "2.3.0"
+    "pubsub-js": "^1.7.0",
+    "redux-devtools-extension": "^2.13.8",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0"
   },
   "peerDependencies": {
     "@edx/frontend-analytics": "^2.0.0",
@@ -93,17 +97,20 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "src/**/*.{js,jsx}"
+      "src/**/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/dist/**"
     ],
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
     },
     "testURL": "http://localhost/",
     "setupFiles": [
-      "./src/setupTest.js"
+      "./src/setupTest.js",
+      "dotenv/config"
     ],
     "transformIgnorePatterns": [
-      "/node_modules/(?!(@edx/paragon)/).*/"
+      "/node_modules/(?!@edx)"
     ]
   }
 }

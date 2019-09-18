@@ -1,13 +1,13 @@
 import React from 'react';
 import { createStore } from 'redux';
 import { mount } from 'enzyme';
+import { createBrowserHistory } from 'history';
 import { configure as configureI18n } from '@edx/frontend-i18n';
-
-import configuration from './configuration';
+import { env } from './handlers/configuration';
 import AppProvider from './AppProvider';
 import App from './App';
 
-configureI18n(configuration, {
+configureI18n(env, {
   ar: {},
   'es-419': {},
   fr: {},
@@ -24,6 +24,7 @@ configureI18n(configuration, {
 });
 
 App.config = {};
+App.history = createBrowserHistory();
 
 describe('AppProvider', () => {
   it('should render its children', () => {
