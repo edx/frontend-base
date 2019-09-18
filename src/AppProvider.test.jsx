@@ -40,5 +40,26 @@ describe('AppProvider', () => {
     expect(list.length).toEqual(2);
     expect(list.at(0).text()).toEqual('Child One');
     expect(list.at(1).text()).toEqual('Child Two');
+
+    const reduxProvider = wrapper.find('Provider');
+    expect(reduxProvider.length).toEqual(1);
+  });
+
+  it('should skip redux Provider if not given a store', () => {
+    const component = (
+      <AppProvider>
+        <div>Child One</div>
+        <div>Child Two</div>
+      </AppProvider>
+    );
+
+    const wrapper = mount(component);
+    const list = wrapper.find('div');
+    expect(list.length).toEqual(2);
+    expect(list.at(0).text()).toEqual('Child One');
+    expect(list.at(1).text()).toEqual('Child Two');
+
+    const reduxProvider = wrapper.find('Provider');
+    expect(reduxProvider.length).toEqual(0);
   });
 });

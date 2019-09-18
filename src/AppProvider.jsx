@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { getLocale, getMessages, IntlProvider } from '@edx/frontend-i18n';
-import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
+
+import OptionalReduxProvider from './OptionalReduxProvider';
 
 import App from './App';
 import ErrorBoundary from './ErrorBoundary';
@@ -12,21 +13,25 @@ const AppProvider = ({ store, children }) => (
   <ErrorBoundary>
     <AppContext.Provider value={{ authenticatedUser: App.authenticatedUser, config: App.config }}>
       <IntlProvider locale={getLocale()} messages={getMessages()}>
-        <Provider store={store}>
+        <OptionalReduxProvider store={store}>
           <Router history={App.history}>
             <React.Fragment>
               {children}
             </React.Fragment>
           </Router>
-        </Provider>
+        </OptionalReduxProvider>
       </IntlProvider>
     </AppContext.Provider>
   </ErrorBoundary>
 );
 
 AppProvider.propTypes = {
-  store: PropTypes.object.isRequired, // eslint-disable-line
+  store: PropTypes.object, // eslint-disable-line
   children: PropTypes.node.isRequired,
+};
+
+AppProvider.defaultProps = {
+  store: null,
 };
 
 export default AppProvider;

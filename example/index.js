@@ -18,7 +18,7 @@ console.warn("TODO: When Parcel 2.0 comes out, use the source code instead of th
 
 App.subscribe(APP_READY, () => {
   ReactDOM.render(
-    <AppProvider store={createStore(state => state)}>
+    <AppProvider>
       <ExamplePage />
     </AppProvider>,
     document.getElementById('root'),
