@@ -35,46 +35,47 @@ export default class App {
     loggingService,
     ...custom
   } = {}) {
+    validateConfig(this._config, 'App environment config validation handler');
+
     try {
-      await this.override(handlers.beforeInit, overrideHandlers.beforeInit);
+      await this._override(handlers.beforeInit, overrideHandlers.beforeInit);
       PubSub.publish(APP_BEFORE_INIT);
 
-      validateConfig(this._config, 'App environment config validation handler');
       this.messages = messages;
       this.loggingService = loggingService;
       this.custom = custom;
 
       // Configuration
-      await this.override(handlers.configuration, overrideHandlers.configuration);
+      await this._override(handlers.configuration, overrideHandlers.configuration);
       PubSub.publish(APP_CONFIGURED);
 
       // Logging
-      await this.override(handlers.logging, overrideHandlers.logging);
+      await this._override(handlers.logging, overrideHandlers.logging);
       PubSub.publish(APP_LOGGING_CONFIGURED);
 
       // Authentication
-      await this.override(handlers.authentication, overrideHandlers.authentication);
+      await this._override(handlers.authentication, overrideHandlers.authentication);
       PubSub.publish(APP_AUTHENTICATED);
 
       // Internationalization
-      await this.override(handlers.i18n, overrideHandlers.i18n);
+      await this._override(handlers.i18n, overrideHandlers.i18n);
       PubSub.publish(APP_I18N_CONFIGURED);
 
       // Analytics
-      await this.override(handlers.analytics, overrideHandlers.analytics);
+      await this._override(handlers.analytics, overrideHandlers.analytics);
       PubSub.publish(APP_ANALYTICS_CONFIGURED);
 
       // Before Ready
-      await this.override(handlers.beforeReady, overrideHandlers.beforeReady);
+      await this._override(handlers.beforeReady, overrideHandlers.beforeReady);
       PubSub.publish(APP_BEFORE_READY);
 
       // Ready
-      await this.override(handlers.ready, overrideHandlers.ready);
+      await this._override(handlers.ready, overrideHandlers.ready);
       PubSub.publish(APP_READY);
     } catch (e) {
       // Error
       this.error = e;
-      await this.override(handlers.error, overrideHandlers.error);
+      await this._override(handlers.error, overrideHandlers.error);
       PubSub.publish(APP_ERROR, e);
     }
   }
@@ -117,7 +118,7 @@ export default class App {
     return pick(this.config, keys);
   }
 
-  static async override(defaultHandler, overrideHandler) {
+  static async _override(defaultHandler, overrideHandler) {
     if (overrideHandler !== undefined) {
       await overrideHandler(this);
     } else {
