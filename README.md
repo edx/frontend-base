@@ -28,6 +28,23 @@ With respect to the initialization process, `frontend-base` helps manage the vas
 - Logging
 - Internationalization
 
+## Running the example app and test suite
+
+This repo has an example app that demonstrates basic usage of the library.
+
+```
+npm install # do this once
+npm start # starts the dev server
+```
+
+Visit http://localhost:1234/ in your browser.
+
+The jest test suite can be run with:
+
+```
+npm test
+```
+
 ## Getting Started
 
 Initialization is managed via the `App` singleton.
