@@ -66,7 +66,21 @@ App.initialize({
 });
 ```
 
-`overrideHandlers` has keys corresponding to the eight lifecycle events.  Including a key will override and replace the corresponding lifecycle handler if provided.  Please see Initialization Lifecycle Phases for more information on the phases responsibilities.
+`overrideHandlers` has keys corresponding to the lifecycle events.  Including a key will override and replace the corresponding lifecycle handler if provided.
+
+Possible keys:
+
+- beforeInit
+- configuration
+- logging
+- authentication
+- i18n
+- analytics
+- beforeReady
+- ready
+- error
+
+Please see Initialization Lifecycle Phases for more information on the phases responsibilities.
 
 #### custom
 
@@ -273,11 +287,13 @@ The result of calling `fetchUserAccount` is that a `userAccount` key is set in t
 
 ## App Initialization Lifecycle Phases
 
-The following lifecycle phases exist.  Their corresponding event constants are in parentheses.  The source code is in `src/handlers`.
+The following lifecycle phases exist.  Their corresponding event constants are listed.  The source code is in `src/handlers`.
 
-Each lifecycle handler can be provided as an `async` function, or as a Promise, allowing asynchronous execution as necessary.  Note that the application will _wait_ for a phase to be complete before moving on to the next phase.
+To override a lifecycle event, functions can be provided to `overrideHandlers` in `App.initialize`, documented above.  Each lifecycle handler can be provided as an `async` function, or as a Promise, allowing asynchronous execution as necessary.  Note that the application will _wait_ for a phase to be complete before moving on to the next phase.
 
 The corresponding event types are published immediately _after_ the lifecycle phase has completed.  Note that the events are published asynchronously using the [pubsub-js](https://github.com/mroderick/PubSubJS) "publish" method.
+
+The lifecycle phases are listed below.  Their names correspond to the keys used in `overrideHandlers`.
 
 ### beforeInit
 
