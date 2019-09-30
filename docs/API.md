@@ -1,53 +1,5 @@
 # API Reference
 
-## Initialization Lifecycle Phases
-
-The following lifecycle phases exist.  Their corresponding event constants are in parentheses.  The source code is in `src/handlers`.
-
-Each lifecycle handler can be provided as an `async` function, or as a Promise, allowing asynchronous execution as necessary.  Note that the application will _wait_ for a phase to be complete before moving on to the next phase.
-
-The corresponding event types are published immediately _after_ the lifecycle phase has completed.  Note that the events are published asynchronously using the [pubsub-js](https://github.com/mroderick/PubSubJS) "publish" method.
-
-### beforeInit (`APP_BEFORE_INIT`)
-
-The `beforeInit` phase has no default behavior.  It can be used to perform actions prior to any of the other phases, but after `App.initialize` has validated its environment configuration.  If you want to perform actions prior to validation of the environment configuration, then write your code before calling `App.initialize` itself.
-
-### configuration (`APP_CONFIGURED`)
-
-The `configuration` phase has no default behavior.
-
-The `configuration` phase can be used to provide dynamic, runtime configuration prior to the initialization of any other services the application may need.
-
-### logging (`APP_LOGGING_CONFIGURED`)
-
-The `logging` phase initializes the NewRelicLoggingService from @edx/frontend-logging by default.
-
-### authentication (`APP_AUTHENTICATED`)
-
-The `authentication` phase creates an authenticated apiClient and makes it available at `App.apiClient` on the `App` singleton.  It also runs `ensureAuthenticatedUser` from @edx/frontend-auth and will redirect to the login experience if the user does not have a valid authentication cookie.  Finally, it will make authenticated user information available at `App.authenticatedUser` and `App.decodedAccessToken` for later use by the application.
-
-### i18n (`APP_I18N_CONFIGURED`)
-
-The `i18n` phase initializes @edx/frontend-i18n with the `messages` object provided to `App.initialize`.
-
-### analytics (`APP_ANALYTICS_CONFIGURED`)
-
-The `analytics` phase initializes Segment and configures @edx/frontend-analytics.
-
-### beforeReady (`APP_BEFORE_READY`)
-
-The `beforeReady` phase has no default behavior.
-
-### ready (`APP_READY`)
-
-The `ready` phase has no default behavior.  This is the phase where an application's interface would generally be shown to the user.
-
-### error (`APP_ERROR`)
-
-The `error` phase logs (to loggingService) whatever error occurred to put the app in an error state.  This is the phase where an application would generally show an error message for an unexpected error to the user.
-
-Note that the error which caused the application to transition to the `error` phase is available at `App.error`.  It is also passed as data to any subscribers to the `APP_ERROR` event.
-
 ## `App`
 
 The `App` class is a singleton with static methods.  This is so that it can be used throughout a consuming application merely by importing it:
@@ -76,7 +28,7 @@ A reference to an object containing information about the currently authenticate
 ```
 ### `App.decodedAccessToken`
 
-A reference to an object containing the raw, decoded JWT access token.  This is the snake_case source for the data in `App.authenticatedUser`.
+For debugging purposes primarily.  A reference to an object containing the raw, decoded JWT access token.  This is the snake_case source for the data in `App.authenticatedUser`.  The schema and contents of the decoded access token are subject to change - `App.authenticatedUser` represents the contract and should be used whenever possible.
 
 ### `App.error`
 
@@ -103,10 +55,12 @@ An example in which we override the authentication handling:
 ```
 App.initialize({
   overrideHandlers: {
-    authentication: () => {
+    authentication: (app) => {
       // As a usage example of overriding one phase of the startup sequence,
       // providing this function will override the default authentication
       // initialization.
+
+      // The 'app' argument is a reference to the App singleton.
     }
   }
 });
@@ -116,7 +70,9 @@ App.initialize({
 
 #### custom
 
-The `custom` property can be used to attach custom data to the `App` which will be exposed at `App.custom`.  This data can be used in custom initialization handlers, or elsewhere in the application as necessary.  Note, if you're using this to provide mutable data to the application, _strongly_ consider using React props, context, or Redux instead.
+You probably don't need this.  This is an escape valve for customization of the handlers.  The `custom` property can be used to attach custom data to the `App` which will be exposed at `App.custom`. This data can be used in custom initialization handlers, or elsewhere in the application as necessary.
+
+Note, if you're using this to provide mutable data to the application, _strongly_ consider using React props, context, or Redux instead.
 
 ### `App.config`
 
@@ -143,6 +99,8 @@ The environment configuration.  Contains the following keys:
 
 If additional, dynamic config is desired, it would be reasonable to add those keys into `App.config`.
 
+Note: By default, `App.config` is available to be used _immediately_, even before `App.initialize` is called.  This is because environment variable-based config (using process.env) is statically linked into the application and so is available as soon as the code is loaded by the browser.  See additional notes under `App.requireConfig` below.
+
 ### `App.apiClient`
 
 A reference to the @edx/frontend-auth authenticated API Client.
@@ -153,38 +111,34 @@ A method allowing consumers of `App` to subscribe to lifecycle events.  `type` i
 
 ```
 import {
-  APP_BEFORE_INIT, APP_CONFIGURED, APP_AUTHENTICATED, APP_I18N_CONFIGURED, APP_LOGGING_CONFIGURED, APP_ANALYTICS_CONFIGURED, APP_BEFORE_READY, APP_READY, APP_ERROR
+  APP_BEFORE_INIT, APP_CONFIG_LOADED, APP_AUTHENTICATED, APP_I18N_CONFIGURED, APP_LOGGING_CONFIGURED, APP_ANALYTICS_CONFIGURED, APP_BEFORE_READY, APP_READY, APP_ERROR
 } from `@edx/frontend-base`
 ```
 
 ### `App.requireConfig(keys, requester)`
 
-A method allowing application code to indicate that particular `App.config` keys are required for them to function.  The method returns the required config values.
+A method allowing application code to indicate that particular `App.config` keys are required for them to function.  Requester is for informational/error reporting purposes only.
+
+The method returns the required config values.
 
 ```
-const config = App.requireConfig(['LMS_BASE_URL', 'LOGIN_URL'], 'The name of my feature/component');
+const config = App.requireConfig(['LMS_BASE_URL', 'LOGIN_URL'], 'MySpecialComponent');
+
+// Will throw an error with:
+// "App configuration error: LOGIN_URL is required by MySpecialComponent."
+// if LOGIN_URL is undefined, for example.
 ```
 
-**NOTE**: If you use App.requireConfig to require config that hasn't been loaded yet (i.e., from a custom `configuration` handler), it will throw an error.  If you use a custom `configuration` handler, you can defer requiring your config by subscribing to the `APP_CONFIGURED` event:
+**NOTE**: If you use a custom handler for the `configuration` phase, be mindful of when you call `App.requireConfig`.  Normally, environment variable configuration is available immediately before `App.initialize` is even called because it's statically linked into the app.  If you load additional configuration at runtime, it won't be available until the `APP_CONFIG_LOADED` event is published:
 
 ```
 let config = null;
-App.subscribe(APP_CONFIGURED, () => {
+App.subscribe(APP_CONFIG_LOADED, () => {
   config = App.requireConfig(['DYNAMICALLY_CONFIGURED_URL'], 'Consumer of custom config');
 
-  // config is known to be set here.
+  // Dynamic config is known to be set here.
 });
-
-export function usesConfig() {
-  /* If this function is not used before APP_CONFIGURED, then this is safe usage.
-   * If you expect your method may be used before APP_CONFIGURED, then you have a
-   * more complex setup.  That sort of thing should be very uncommon.
-   */
-  console.log(config.DYNAMICALLY_CONFIGURED_URL);
-}
 ```
-
-Environment variable-based config is immediately available on file load, so generally waiting for APP_CONFIGURED is not necessary.
 
 ### `App.queryParams`
 
@@ -265,3 +219,122 @@ export default connect(null, {
 })(MyComponent);
 
 MyComponent.contextType = AppContext;
+```
+
+The result of calling `fetchUserAccount` is that a `userAccount` key is set in the redux store.
+
+```
+// Redux state tree sample:
+{
+  userAccount: {
+    loading: false,
+    loaded: true,
+    error: null,
+    username: 'edx_example_user',
+    email: 'edx@example.com',
+    bio: 'An example user',
+    name: 'Example User',
+    country: 'US',
+    socialLinks: [
+      {
+        platform: 'twitter',
+        socialLink: 'https://www.twitter.com/edx_example_user'
+      }
+    ],
+    profileImage: {
+      imageUrlFull: 'https://profile-images.example.com/images/full/edx_example_user.png',
+      imageUrlLarge: 'https://profile-images.example.com/images/large/edx_example_user.png',
+      imageUrlMedium: 'https://profile-images.example.com/images/medium/edx_example_user.png',
+      imageUrlSmall: 'https://profile-images.example.com/images/small/edx_example_user.png',
+      hasImage: true
+    },
+    levelOfEducation: 'b',
+    mailingAddress: null,
+    extendedProfile: [],
+    dateJoined: '2019-01-01T01:01:01Z',
+    accomplishmentsShared: false,
+    isActive: true,
+    yearOfBirth: 1912,
+    goals: null,
+    languageProficiencies: [
+      {
+        code: 'en'
+      }
+    ],
+    courseCertificates: null,
+    requiresParentalConsent: false,
+    secondaryEmail: null,
+    timeZone: null,
+    gender: null,
+    accountPrivacy: 'custom'
+  }
+}
+```
+
+## App Initialization Lifecycle Phases
+
+The following lifecycle phases exist.  Their corresponding event constants are in parentheses.  The source code is in `src/handlers`.
+
+Each lifecycle handler can be provided as an `async` function, or as a Promise, allowing asynchronous execution as necessary.  Note that the application will _wait_ for a phase to be complete before moving on to the next phase.
+
+The corresponding event types are published immediately _after_ the lifecycle phase has completed.  Note that the events are published asynchronously using the [pubsub-js](https://github.com/mroderick/PubSubJS) "publish" method.
+
+### beforeInit
+
+Event constant: `APP_BEFORE_INIT`
+
+The `beforeInit` phase has no default behavior.  It can be used to perform actions prior to any of the other phases, but after `App.initialize` has validated its environment configuration.  If you want to perform actions prior to validation of the environment configuration, then write your code before calling `App.initialize` itself.
+
+### configuration
+
+Event constant: `APP_CONFIG_LOADED`
+
+The `configuration` phase has no default behavior.
+
+The `configuration` phase can be used to provide dynamic, runtime configuration prior to the initialization of any other services the application may need.
+
+### logging
+
+Event constant: `APP_LOGGING_CONFIGURED`
+
+The `logging` phase initializes the NewRelicLoggingService from @edx/frontend-logging by default.
+
+### authentication
+
+Event constant: `APP_AUTHENTICATED`
+
+The `authentication` phase creates an authenticated apiClient and makes it available at `App.apiClient` on the `App` singleton.  It also runs `ensureAuthenticatedUser` from @edx/frontend-auth and will redirect to the login experience if the user does not have a valid authentication cookie.  Finally, it will make authenticated user information available at `App.authenticatedUser` and `App.decodedAccessToken` for later use by the application.
+
+Default behavior is to redirect to a login page during this phase if the user is not authenticated.  This effectively means that the library does not support anonymous users without overrides.
+
+### i18n
+
+Event constant: `APP_I18N_CONFIGURED`
+
+The `i18n` phase initializes @edx/frontend-i18n with the `messages` object provided to `App.initialize`.
+
+### analytics
+
+Event constant: `APP_ANALYTICS_CONFIGURED`
+
+The `analytics` phase initializes Segment and configures @edx/frontend-analytics.
+
+### beforeReady
+
+Event constant: `APP_BEFORE_READY`
+
+The `beforeReady` phase has no default behavior.
+
+### ready
+
+Event constant: `APP_READY`
+
+The `ready` phase has no default behavior.  This is the phase where an application's interface would generally be shown to the user.
+
+### error
+
+Event constant: `APP_ERROR`
+
+The `error` phase logs (to loggingService) whatever error occurred to put the app in an error state.  This is the phase where an application would generally show an error message for an unexpected error to the user.
+
+Note that the error which caused the application to transition to the `error` phase is available at `App.error`.  It is also passed as data to any subscribers to the `APP_ERROR` event.

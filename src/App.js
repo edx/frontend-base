@@ -10,7 +10,7 @@ import env from './env';
 
 export const APP_TOPIC = 'APP';
 export const APP_BEFORE_INIT = `${APP_TOPIC}.BEFORE_INIT`;
-export const APP_CONFIGURED = `${APP_TOPIC}.CONFIGURED`;
+export const APP_CONFIG_LOADED = `${APP_TOPIC}.CONFIGURED`;
 export const APP_AUTHENTICATED = `${APP_TOPIC}.AUTHENTICATED`;
 export const APP_I18N_CONFIGURED = `${APP_TOPIC}.I18N_CONFIGURED`;
 export const APP_LOGGING_CONFIGURED = `${APP_TOPIC}.LOGGING_CONFIGURED`;
@@ -47,7 +47,7 @@ export default class App {
 
       // Configuration
       await this._override(handlers.configuration, overrideHandlers.configuration);
-      PubSub.publish(APP_CONFIGURED);
+      PubSub.publish(APP_CONFIG_LOADED);
 
       // Logging
       await this._override(handlers.logging, overrideHandlers.logging);
@@ -108,7 +108,7 @@ export default class App {
     return this.getQueryParams(global.location.search);
   }
 
-  static requireConfig(keys, requester) {
+  static requireConfig(keys, requester = 'unspecified application code') {
     keys.forEach((key) => {
       if (this.config[key] === undefined) {
         throw new Error(`App configuration error: ${key} is required by ${requester}.`);

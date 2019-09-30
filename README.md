@@ -78,7 +78,7 @@ This initialization sequence will do the following:
 
 If an error occurs during the initialization sequence, the application will go into an error state and log the error to the logging service.
 
-You can hook into this state by subscribing to the `APP_ERROR` event.  For convenience, `frontend-base` provides a simple `<ErrorPage>` component that can be used to display errors to the user of the app as a fallback error experience.
+You can hook into this state by subscribing to the `APP_ERROR` event.  For convenience, `frontend-base` provides a simple `<ErrorPage>` component that can be used to display errors to the user of the app as a fallback error experience.  This experience can be used as-is (shown below), or replaced with your own error page experience.
 
 ```
 App.subscribe(APP_ERROR, (error) => {
@@ -88,11 +88,15 @@ App.subscribe(APP_ERROR, (error) => {
 
 ### Error handling after initialization (in React)
 
-It's recommended that in React applications you use [error boundaries](https://reactjs.org/docs/error-boundaries.html) to catch run-time errors in your React components.  `frontend-base` provides an error boundary component which displays `<ErrorPage>` in the event of an uncaught error in React.  If you use `<AppProvider>` then you'll get this behavior for free.  Note that if you add your own error boundary inside `<AppProvider>`, the fallback handling will effectively be ignored (since errors won't bubble up to it anymore).
+It's recommended that in React applications you use [error boundaries](https://reactjs.org/docs/error-boundaries.html) to catch run-time errors in your React components.
+
+`frontend-base` provides an error boundary component which displays `<ErrorPage>` in the event of an uncaught error in React. If you use `<AppProvider>` then you'll get this behavior for free.
+
+If you need a custom error page, you can add your own error boundary inside `<AppProvider>` and the fallback handling will effectively be ignored (since errors won't bubble up to it anymore).
 
 ### Foundational React Components
 
-`frontend-base` also includes several React components which pair with the App singleton to help bootstrap your React application.  Please see the API documentation for `<AppProvider>` and `<AppContext>` specifically; they're an important part of the frontend-base ecosystem.
+`frontend-base` also provides several companion React components which pair with the App singleton to help bootstrap your React application.  Please see the API documentation for `<AppProvider>` and `<AppContext>` specifically; they're an important part of the frontend-base ecosystem.
 
 ## Additional Resources
 
