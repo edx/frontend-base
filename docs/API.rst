@@ -64,11 +64,20 @@ error phase.
 
 .. _appinitialize-messages-loggingservice-overridehandlers-custom-:
 
-``App.initialize({ messages, loggingService, overrideHandlers, custom })``
+``App.initialize({ allowAnonymous, hydrateAuthenticatedUser, messages, loggingService, overrideHandlers, custom })``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``App.initialize`` method takes an options object with four possible
-keys:
+The ``App.initialize`` method takes an options object with the following possible keys:
+
+allowAnonymous
+^^^^^^^^^^^^^^
+
+If true, turns off automatic login redirection for unauthenticated users.  Defaults to false, meaning that by default the application is authenticated-only.
+
+hydrateAuthenticatedUser
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+If true, makes an API call to the user account endpoint (```${App.config.LMS_BASE_URL}/api/user/v1/accounts/${username}```) to fetch detailed account information for the authenticated user. This data is merged into ```App.authenticatedUser```, overriding any duplicate keys that already exist. Defaults to false, meaning that no additional account information will be loaded.
 
 messages
 ^^^^^^^^
@@ -277,16 +286,34 @@ the following data structure:
      config: <THE App.config OBJECT>
    }
 
-While the only data in ``AppContext`` today is data that would generally
-become stable/unchanging prior to ``APP_READY`` (meaning before React
-even renders for the first time), using ``AppContext`` is a preferrable
-way to access it in React components as it leaves the door open for that
-data to become mutable in the future. You could imagine an in-app login
-experience which updates authenticatedUser after React mounts, for
-instance, or loading config data dynamically based on user actions.
+If the ``App.authenticatedUser`` or ``App.config`` data changes, ``AppContext`` will be updated accordingly and pass those changes onto React components using the context.
 
 ``AppContext`` is used in a React application like any other `React
 Context <https://reactjs.org/docs/context.html>`__
+
+``AuthenticatedRoute``
+----------------------
+
+``AuthenticatedRoute`` can be used in conjunction with ``allowAnonymous`` to configure a subset of an application's client-side routes to redirect to login for unauthenticated users.
+
+::
+
+   <AppProvider>
+     <Route exact path="/" component={UnauthenticatedPage} />
+     <AuthenticatedRoute exact path="/authenticated" component={AuthenticatedPage} />
+   </AppProvider>
+
+In the above example, an anonmyous/unauthenticated user navigating to /authenticated will be redirected to the login page.
+
+``LoginRedirect``
+-----------------
+
+``LoginRedirect`` is a React component that, when rendered, redirects to the login page as a side effect.
+
+``getAuthenticatedUserAccount``
+-------------------------------
+
+This async function is used internally when the ``hydrateAuthenticatedUser`` initialization option is true in order to fetch user account information.  In general, you shouldn't need to use this directly.
 
 ``validateConfig``
 ------------------
@@ -311,6 +338,8 @@ An exception will be thrown if any of the keys in ``customConfig`` are
 
 ``fetchUserAccount``
 --------------------
+
+**Use of this redux action is deprecated.  Prefer the ``hydrateAuthenticatedUser`` initialization option.**
 
 The ``fetchUserAccount`` action is a wrapper around @edx/frontend-auth's
 own ``fetchUserAccount`` action which makes it a bit easier to use.
