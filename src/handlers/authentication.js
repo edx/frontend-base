@@ -28,7 +28,7 @@ export default async function authentication(app) {
   app.authenticatedUser = authenticatedUser;
   app.decodedAccessToken = decodedAccessToken;
 
-  if (!app.allowAnonymous && app.authenticatedUser === null) {
+  if (app.requireAuthenticatedUser && app.authenticatedUser === null) {
     loginRedirect();
   }
 

@@ -2,11 +2,15 @@ import { getAuthenticatedAPIClient } from '@edx/frontend-auth';
 
 import authentication from './authentication';
 import App, { AUTHENTICATED_USER_CHANGED } from '../App';
-import * as Api from '../Api';
 
 jest.mock('@edx/frontend-auth', () => ({
   getAuthenticatedAPIClient: jest.fn(() => ({
     login: jest.fn(),
+    get: jest.fn(async () => ({
+      data: {
+        name: 'edX User',
+      },
+    })),
     getAuthenticatedUser: jest.fn(async (path) => {
       if (path === '/authenticated') {
         return {
@@ -35,7 +39,7 @@ jest.mock('@edx/frontend-auth', () => ({
 describe('authentication', () => {
   it('should create an API client, ensure we have an authenticated user, and extract user data from the token', async () => {
     window.history.pushState({}, '', '/i/am/a/path');
-
+    App.requireAuthenticatedUser = true;
     await authentication(App);
 
     expect(getAuthenticatedAPIClient).toHaveBeenCalledWith({
@@ -49,7 +53,6 @@ describe('authentication', () => {
       refreshAccessTokenEndpoint: 'http://localhost:18000/login_refresh',
       userInfoCookieName: 'edx-user-info',
     });
-    // TODO: There's an async in here - we probably need to wait for it.
     expect(App.apiClient.getAuthenticatedUser).toHaveBeenCalledWith('/i/am/a/path');
     expect(App.authenticatedUser).toEqual({
       userId: 'user123',
@@ -66,7 +69,8 @@ describe('authentication', () => {
     expect(App.apiClient.login).not.toHaveBeenCalled();
   });
 
-  it('should perform a login redirect if the user is not authenticated and allowAnonymous is false', async () => {
+  it('should perform a login redirect if the user is not authenticated and requireAuthenticatedUser is true', async () => {
+    App.requireAuthenticatedUser = true;
     window.history.pushState({}, '', '/authenticated');
 
     await authentication(App);
@@ -81,7 +85,6 @@ describe('authentication', () => {
       refreshAccessTokenEndpoint: 'http://localhost:18000/login_refresh',
       userInfoCookieName: 'edx-user-info',
     });
-    // TODO: There's an async in here - we probably need to wait for it.
     expect(App.apiClient.getAuthenticatedUser).toHaveBeenCalledWith('/authenticated');
     expect(App.authenticatedUser).toEqual(null);
     expect(App.decodedAccessToken).toEqual(null);
@@ -89,9 +92,6 @@ describe('authentication', () => {
   });
 
   it('should perform a user account fetch if hydrateAuthenticatedUser is true', async (done) => {
-    jest.spyOn(Api, 'get').mockImplementation(async () => ({
-      name: 'edX User',
-    }));
     window.history.pushState({}, '', '/');
     App.hydrateAuthenticatedUser = true;
 
@@ -118,7 +118,6 @@ describe('authentication', () => {
       refreshAccessTokenEndpoint: 'http://localhost:18000/login_refresh',
       userInfoCookieName: 'edx-user-info',
     });
-    // TODO: There's an async in here - we probably need to wait for it.
     expect(App.apiClient.getAuthenticatedUser).toHaveBeenCalledWith('/');
     // Name shouldn't be in authenticatedUser yet.
     expect(App.authenticatedUser).toEqual({

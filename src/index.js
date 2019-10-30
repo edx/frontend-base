@@ -21,17 +21,7 @@ export {
   camelCaseObject,
   snakeCaseObject,
   convertKeyNames,
-  formatKnownError,
-  isKnownError,
-  request,
-  get,
-  del,
-  head,
-  options,
-  patch,
-  post,
-  put,
-} from './Api';
+} from './api';
 
 // Components & Context
 export { default as AppContext } from './AppContext';

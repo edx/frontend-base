@@ -100,10 +100,10 @@ error phase.
 
 The ``App.initialize`` method takes an options object with the following possible keys:
 
-allowAnonymous
-^^^^^^^^^^^^^^
+requireAuthenticatedUser
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-If true, turns off automatic login redirection for unauthenticated users.  Defaults to false, meaning that by default the application is authenticated-only.
+If true, turns on automatic login redirection for unauthenticated users.  Defaults to false, meaning that by default the application will allow anonymous/unauthenticated sessions.
 
 hydrateAuthenticatedUser
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -234,6 +234,10 @@ Phases". There are constants for all the event types:
      APP_BEFORE_INIT, APP_CONFIG_LOADED, APP_AUTHENTICATED, APP_I18N_CONFIGURED, APP_LOGGING_CONFIGURED, APP_ANALYTICS_CONFIGURED, APP_BEFORE_READY, APP_READY, APP_ERROR
    } from `@edx/frontend-base`
 
+   App.subscribe(APP_BEFORE_READY, () => {
+     // Do something in the beforeReady phase.
+   });
+
 .. _apprequireconfigkeys-requester:
 
 ``App.mergeConfig(newConfig, requester)``
@@ -325,7 +329,7 @@ Context <https://reactjs.org/docs/context.html>`__
 ``AuthenticatedRoute``
 ----------------------
 
-``AuthenticatedRoute`` can be used in conjunction with ``allowAnonymous`` to configure a subset of an application's client-side routes to redirect to login for unauthenticated users.
+``AuthenticatedRoute`` can be used when ``requireAuthenticatedUser`` is ``false`` to configure a subset of an application's client-side routes to redirect to login for unauthenticated users.
 
 ::
 

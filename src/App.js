@@ -27,7 +27,7 @@ export const CONFIG_CHANGED = `${CONFIG_TOPIC}.CHANGED`;
 export default class App {
   static _config = env;
   static _apiClient = null;
-  static allowAnonymous = false;
+  static requireAuthenticatedUser = false;
   static hydrateAuthenticatedUser = false;
   static history = null;
   static _authenticatedUser = null;
@@ -36,7 +36,7 @@ export default class App {
   static error = null;
 
   static async initialize({
-    allowAnonymous = false,
+    requireAuthenticatedUser = false,
     hydrateAuthenticatedUser = false,
     loggingService,
     messages,
@@ -49,7 +49,7 @@ export default class App {
       await this._override(handlers.beforeInit, overrideHandlers.beforeInit);
       PubSub.publish(APP_BEFORE_INIT);
 
-      this.allowAnonymous = allowAnonymous;
+      this.requireAuthenticatedUser = requireAuthenticatedUser;
       this.hydrateAuthenticatedUser = hydrateAuthenticatedUser;
       this.messages = messages;
       this.loggingService = loggingService;

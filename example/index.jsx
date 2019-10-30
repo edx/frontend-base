@@ -24,6 +24,6 @@ App.subscribe(APP_ERROR, (error) => {
 
 App.initialize({
   messages: [],
-  allowAnonymous: true,
+  requireAuthenticatedUser: true,
   hydrateAuthenticatedUser: true,
 });

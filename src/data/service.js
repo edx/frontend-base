@@ -1,10 +1,11 @@
 import App from '../App';
-import { get } from '../Api';
+import { camelCaseObject } from '../api';
 
 // eslint-disable-next-line import/prefer-default-export
 export async function getAuthenticatedUserAccount() {
   const { username } = App.authenticatedUser;
-  return get(`${App.config.LMS_BASE_URL}/api/user/v1/accounts/${username}`);
+  const { data } = await App.apiClient.get(`${App.config.LMS_BASE_URL}/api/user/v1/accounts/${username}`);
+  return camelCaseObject(data);
 }
 
 function breakOnRedirectFromLogin() {
