@@ -46,5 +46,4 @@ export { default as getQueryParameters } from './data/getQueryParameters';
 export { default as validateConfig } from './data/validateConfig';
 export { default as env } from './data/env';
 export { useAppEvent } from './data/hooks';
-export { fetchUserAccount } from './frontendAuthWrapper';
 export { getAuthenticatedUserAccount } from './data/service';
