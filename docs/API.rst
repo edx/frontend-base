@@ -1,6 +1,37 @@
 API Reference
 =============
 
+- `App`_
+   - `App.history`_
+   - `App.authenticatedUser`_
+   - `App.decodedAccessToken`_
+   - `App.error`_
+   - `App.initialize(options)`_
+   - `App.config`_
+   - `App.apiClient`_
+   - `App.subscribe(type, callback)`_
+   - `App.mergeConfig(newConfig, requester)`_
+   - `App.ensureConfig(keys, requester)`_
+   - `App.queryParams`_
+- `AppProvider`_
+- `AppContext`_
+- `AuthenticatedRoute`_
+- `LoginRedirect`_
+- `getAuthenticatedUserAccount`_
+- `validateConfig`_
+- `fetchUserAccount`_
+- `App Initialization Lifecycle Phases`_
+   - `beforeInit`_
+   - `loadConfig`_
+   - `logging`_
+   - `authentication`_
+   - `i18n`_
+   - `analytics`_
+   - `beforeReady`_
+   - `ready`_
+   - `error`_
+
+
 ``App``
 -------
 
@@ -64,7 +95,7 @@ error phase.
 
 .. _appinitialize-messages-loggingservice-overridehandlers-custom-:
 
-``App.initialize({ allowAnonymous, hydrateAuthenticatedUser, messages, loggingService, overrideHandlers, custom })``
+``App.initialize(options)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``App.initialize`` method takes an options object with the following possible keys:
