@@ -498,8 +498,8 @@ makes it available at ``App.apiClient`` on the ``App`` singleton. It
 also runs ``ensureAuthenticatedUser`` from @edx/frontend-auth and will
 redirect to the login experience if the user does not have a valid
 authentication cookie. Finally, it will make authenticated user
-information available at ``App.authenticatedUser`` and
-``App.decodedAccessToken`` for later use by the application.
+information available at ``App.authenticatedUser`` for later use by the
+application.
 
 Default behavior is to redirect to a login page during this phase if the
 user is not authenticated. This effectively means that the library does
