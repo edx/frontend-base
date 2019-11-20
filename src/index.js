@@ -14,6 +14,8 @@ export {
   AUTHENTICATED_USER_CHANGED,
   CONFIG_TOPIC,
   CONFIG_CHANGED,
+  LOCALE_TOPIC,
+  LOCALE_CHANGED,
 } from './App';
 
 export {
