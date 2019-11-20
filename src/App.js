@@ -23,6 +23,9 @@ export const AUTHENTICATED_USER_CHANGED = `${AUTHENTICATED_USER_TOPIC}.CHANGED`;
 export const CONFIG_TOPIC = 'CONFIG';
 export const CONFIG_CHANGED = `${CONFIG_TOPIC}.CHANGED`;
 
+export const LOCALE_TOPIC = 'LOCALE';
+export const LOCALE_CHANGED = `${LOCALE_TOPIC}.CHANGED`;
+
 /* eslint no-underscore-dangle: "off" */
 export default class App {
   static _config = env;
@@ -126,6 +129,10 @@ export default class App {
 
   static unsubscribe(token) {
     PubSub.unsubscribe(token);
+  }
+
+  static publish(message, data) {
+    PubSub.publish(message, data);
   }
 
   static get queryParams() {

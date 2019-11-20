@@ -5,7 +5,7 @@ import { Router } from 'react-router-dom';
 
 import OptionalReduxProvider from './OptionalReduxProvider';
 
-import App, { AUTHENTICATED_USER_CHANGED, CONFIG_CHANGED } from './App';
+import App, { AUTHENTICATED_USER_CHANGED, CONFIG_CHANGED, LOCALE_CHANGED } from './App';
 import ErrorBoundary from './ErrorBoundary';
 import AppContext from './AppContext';
 import { useAppEvent } from './data/hooks';
@@ -13,6 +13,7 @@ import { useAppEvent } from './data/hooks';
 const AppProvider = ({ store, children }) => {
   const [config, setConfig] = useState(App.config);
   const [authenticatedUser, setAuthenticatedUser] = useState(App.authenticatedUser);
+  const [locale, setLocale] = useState(getLocale());
 
   useAppEvent(AUTHENTICATED_USER_CHANGED, () => {
     setAuthenticatedUser(App.authenticatedUser);
@@ -22,12 +23,16 @@ const AppProvider = ({ store, children }) => {
     setConfig(App.config);
   });
 
+  useAppEvent(LOCALE_CHANGED, () => {
+    setLocale(getLocale());
+  });
+
   return (
     <ErrorBoundary>
       <AppContext.Provider
-        value={{ authenticatedUser, config }}
+        value={{ authenticatedUser, config, locale }}
       >
-        <IntlProvider locale={getLocale()} messages={getMessages()}>
+        <IntlProvider locale={locale} messages={getMessages()}>
           <OptionalReduxProvider store={store}>
             <Router history={App.history}>
               <React.Fragment>{children}</React.Fragment>
