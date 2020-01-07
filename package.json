@@ -46,7 +46,7 @@
     "@edx/paragon": "7.1.5",
     "babel-polyfill": "6.26.0",
     "codecov": "3.5.0",
-    "enzyme": "3.10.0",
+    "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.2",
     "husky": "3.0.9",
     "prop-types": "15.7.2",
